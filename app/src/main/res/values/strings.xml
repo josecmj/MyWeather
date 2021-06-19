@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">MyWeatherAppSchool</string>
+    <string name="title_search">Search</string>
+    <string name="title_favorites">Favorites</string>
+    <string name="title_settings">Settings</string>
+
+    <string name="settings_language">Linguagem</string>
+    <string name="settings_tempunit">Unidade de Temperatura</string>
+    <string name="settings_language_eng">Inglês</string>
+    <string name="settings_language_pt">Português</string>
+    <string name="settings_tempunit_c">C</string>
+    <string name="settings_tempunit_f">F</string>
+    <string name="pref_file">prefFile</string>
+    <string name="search">Buscar</string>
+</resources>
