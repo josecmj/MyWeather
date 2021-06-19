@@ -11,9 +11,12 @@ import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.RecyclerView
 import com.josecmj.myweatherappschool.databinding.FragmentSearchBinding
+import com.josecmj.myweatherappschool.model.Place
 import com.josecmj.myweatherappschool.model.RetrofitInitializer
 import com.josecmj.myweatherappschool.model.QueryResult
 import retrofit2.Call
@@ -45,20 +48,37 @@ class SearchFragment : Fragment() {
             textView.text = it
         })
 
+        val itemAdapter = ListAdapter ( { item -> adapterOnClick(item) })
+
+        val recyclerView: RecyclerView = binding.recyclerView
+        recyclerView.adapter = itemAdapter
+
         binding.txtSearch.setEndIconOnClickListener {
             if(context != null) {
                 if (!isInternetAvailable(requireContext())){
                     Toast.makeText(context, "No internet connection", Toast.LENGTH_SHORT).show()
+                }else{
+                    loadData(itemAdapter)
                 }
+
             }
         }
 
+        return root
+    }
+
+    private fun adapterOnClick(item: Place) {
+
+    }
+
+    fun loadData(itemAdapter: ListAdapter) {
         val call = RetrofitInitializer().weatherService().queryWeather("recife","5fde54966e3e1c8a80e436245bdf9672", "metric")
 
         call.enqueue(object : Callback<QueryResult> {
             override fun onResponse(call: Call<QueryResult>, response: Response<QueryResult>) {
                 response?.body()?.let {
                     val notes: QueryResult = it
+                    itemAdapter.submitList(notes.list)
                     Log.d("ZECA", notes.toString())
                 }
             }
@@ -67,12 +87,6 @@ class SearchFragment : Fragment() {
                 Log.d("ZECA","error")
             }
         })
-
-
-
-
-
-        return root
     }
 
     fun isInternetAvailable(context: Context): Boolean {
@@ -96,5 +110,27 @@ class SearchFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+
+}
+
+class WeatherViewModel : LiveData<List<Place>> (emptyList()) {
+    fun loadData() {
+        val call = RetrofitInitializer().weatherService().queryWeather("recife","5fde54966e3e1c8a80e436245bdf9672", "metric")
+
+        call.enqueue(object : Callback<QueryResult> {
+            override fun onResponse(call: Call<QueryResult>, response: Response<QueryResult>) {
+                response?.body()?.let {
+                    val notes: QueryResult = it
+                    value = notes.list
+                    Log.d("ZECA", notes.toString())
+                }
+            }
+
+            override fun onFailure(call: Call<QueryResult>, t: Throwable) {
+                Log.d("ZECA","error")
+            }
+        })
     }
 }
